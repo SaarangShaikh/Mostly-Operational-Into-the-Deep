@@ -130,4 +130,8 @@ class SampleProcessor : VisionProcessor {
         return results
     }
 
+    fun getResults(): OpenCVResults {
+        return recentResults
+    }
+
 }
