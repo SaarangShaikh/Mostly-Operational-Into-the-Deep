@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.VisionProcessors
 
 import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration
 import org.firstinspires.ftc.vision.VisionProcessor
 import org.opencv.core.Core
@@ -8,9 +10,11 @@ import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.core.MatOfPoint
 import org.opencv.core.MatOfPoint2f
+import org.opencv.core.Rect
 import org.opencv.core.Scalar
 import org.opencv.core.Size
 import org.opencv.imgproc.Imgproc
+
 
 data class OpenCVResults(val detections: ArrayList<OpenCVDetections>)
 
@@ -22,6 +26,7 @@ data class OpenCVDetections(val x: Int, val y: Int, val rotation: Double, val co
 
 class SampleProcessor : VisionProcessor {
     private var enabledColours: List<Boolean> = listOf(true, true, true) // Red, blue, yellow
+    private var recentResults = OpenCVResults(ArrayList())
 
     override fun init(width: Int, height: Int, calibration: CameraCalibration?) {
         // Not applicable, but it's necessary for a VisionProcessor :(
@@ -34,7 +39,7 @@ class SampleProcessor : VisionProcessor {
         val matBlue   =  Mat()
         val matYellow =  Mat()
         val results   =  OpenCVResults(ArrayList())
-        Imgproc.GaussianBlur(frame, frame, Size(5.0, 5.0), 0.0)
+        Imgproc.GaussianBlur(frame, frame, Size(25.0, 25.0), 0.0)
         Imgproc.cvtColor(frame, srcHSV, Imgproc.COLOR_BGR2HSV)
 
         if (enabledColours[0]) {
@@ -56,7 +61,18 @@ class SampleProcessor : VisionProcessor {
             results.detections.addAll(yellowResults)
         }
 
+        recentResults = results
+
         return results
+    }
+
+    private fun makeGraphicsRect(rect: Rect, scaleBmpPxToCanvasPx: Float): Rect {
+        val left = Math.round(rect.x * scaleBmpPxToCanvasPx).toInt()
+        val top = Math.round(rect.y * scaleBmpPxToCanvasPx).toInt()
+        val right = (left + Math.round(rect.width * scaleBmpPxToCanvasPx)).toInt()
+        val bottom = (top + Math.round(rect.height * scaleBmpPxToCanvasPx)).toInt()
+
+        return Rect(left, top, right, bottom)
     }
 
     override fun onDrawFrame(
@@ -67,7 +83,16 @@ class SampleProcessor : VisionProcessor {
         scaleCanvasDensity: Float,
         userContext: Any?
     ) {
+        val circPaint = Paint()
+        circPaint.color = Color.RED
+        circPaint.style = Paint.Style.STROKE
+        circPaint.strokeWidth = scaleCanvasDensity * 4
 
+        (userContext as OpenCVResults).detections.forEach {
+            val cx = it.x * scaleBmpPxToCanvasPx
+            val cy = it.y * scaleBmpPxToCanvasPx
+            canvas!!.drawCircle(cx, cy, scaleCanvasDensity * 16, circPaint)
+        }
     }
 
     fun setEnabledColors(red: Boolean, blue: Boolean, yellow: Boolean) {
@@ -87,7 +112,6 @@ class SampleProcessor : VisionProcessor {
             val perimeter = Imgproc.arcLength(cont2f, true)
             val approx = MatOfPoint2f()
             Imgproc.approxPolyDP(cont2f, approx, 0.04 * perimeter, true)
-            val boundingRect = Imgproc.boundingRect(it)
 
             val pointsList = approx.toList()
 
