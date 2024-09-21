@@ -10,6 +10,7 @@ import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.core.MatOfPoint
 import org.opencv.core.MatOfPoint2f
+import org.opencv.core.Point
 import org.opencv.core.Rect
 import org.opencv.core.Scalar
 import org.opencv.core.Size
@@ -22,10 +23,10 @@ enum class SampleColour {
     RED, BLUE, YELLOW
 }
 
-data class OpenCVDetections(val x: Int, val y: Int, val rotation: Double, val colour: SampleColour)
+data class OpenCVDetections(val x: Int, val y: Int, val rotation: Double, val colour: SampleColour, val pointsList: List<Point>)
 
 class SampleProcessor : VisionProcessor {
-    private var enabledColours: List<Boolean> = listOf(true, true, true) // Red, blue, yellow
+    private var enabledColours: List<Boolean> = listOf(false, false, true) // Red, blue, yellow
     private var recentResults = OpenCVResults(ArrayList())
 
     override fun init(width: Int, height: Int, calibration: CameraCalibration?) {
@@ -39,7 +40,7 @@ class SampleProcessor : VisionProcessor {
         val matBlue   =  Mat()
         val matYellow =  Mat()
         val results   =  OpenCVResults(ArrayList())
-        Imgproc.GaussianBlur(frame, frame, Size(25.0, 25.0), 0.0)
+        Imgproc.GaussianBlur(frame, frame, Size(5.0, 5.0), 0.0)
         Imgproc.cvtColor(frame, srcHSV, Imgproc.COLOR_BGR2HSV)
 
         if (enabledColours[0]) {
@@ -85,7 +86,7 @@ class SampleProcessor : VisionProcessor {
     ) {
         val circPaint = Paint()
         circPaint.color = Color.RED
-        circPaint.style = Paint.Style.STROKE
+        circPaint.style = Paint.Style.FILL_AND_STROKE
         circPaint.strokeWidth = scaleCanvasDensity * 4
 
         (userContext as OpenCVResults).detections.forEach {
@@ -119,7 +120,7 @@ class SampleProcessor : VisionProcessor {
                 val x = ((pointsList[0].x + pointsList[1].x + pointsList[2].x + pointsList[3].x) / 4).toInt()
                 val y = ((pointsList[0].y + pointsList[1].y + pointsList[2].y + pointsList[3].y) / 4).toInt()
                 val rotation = 0.0 // TODO: FIND ROTATION USING POINTS
-                val detection = OpenCVDetections(x, y, rotation, colour)
+                val detection = OpenCVDetections(x, y, rotation, colour, pointsList)
 
                 results.add(detection)
             }
