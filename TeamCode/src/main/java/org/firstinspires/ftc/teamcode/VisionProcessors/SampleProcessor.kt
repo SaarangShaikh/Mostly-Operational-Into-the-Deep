@@ -26,7 +26,7 @@ enum class SampleColour {
 data class OpenCVDetections(val x: Int, val y: Int, val rotation: Double, val colour: SampleColour, val pointsList: List<Point>)
 
 class SampleProcessor : VisionProcessor {
-    private var enabledColours: List<Boolean> = listOf(false, false, true) // Red, blue, yellow
+    private var enabledColours: List<Boolean> = listOf(true, true, true) // Red, blue, yellow
     private var recentResults = OpenCVResults(ArrayList())
 
     override fun init(width: Int, height: Int, calibration: CameraCalibration?) {
@@ -96,17 +96,21 @@ class SampleProcessor : VisionProcessor {
         }
     }
 
-    fun setEnabledColors(red: Boolean, blue: Boolean, yellow: Boolean) {
+    fun setEnabledColours(red: Boolean, blue: Boolean, yellow: Boolean) {
         enabledColours = listOf(red, blue, yellow)
+    }
+
+    fun getEnabledColours(): List<Boolean> {
+        return enabledColours
     }
 
     private fun findSamples(mat: Mat, colour: SampleColour): ArrayList<OpenCVDetections> {
         val results = ArrayList<OpenCVDetections>()
-        val conts: List<MatOfPoint> = ArrayList()
+        val contours: List<MatOfPoint> = ArrayList()
         val hierarchy = Mat()
-        Imgproc.findContours(mat, conts, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)
+        Imgproc.findContours(mat, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)
 
-        conts.forEach {
+        contours.forEach {
             val cont2f = MatOfPoint2f()
             it.convertTo(cont2f, CvType.CV_32F)
 
