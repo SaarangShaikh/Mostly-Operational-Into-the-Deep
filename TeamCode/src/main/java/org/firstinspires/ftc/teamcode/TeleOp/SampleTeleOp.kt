@@ -24,35 +24,45 @@ class SampleTeleOp : LinearOpMode() {
         val motorBR = hardwareMap.get(DcMotor::class.java, "motorBR")
         val rotateMotor = hardwareMap.get(DcMotor::class.java, "motorRotate")
         val slideMotor = hardwareMap.get(DcMotor::class.java, "motorSlide")
-        slideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rotateMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rotateMotor!!.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
+        slideMotor!!.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
+//        slideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        rotateMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         waitForStart()
         while(opModeIsActive()) {
-            var joystickY= -gamepad1.left_stick_y;
 
-            if(target+joystickY<850&&target+joystickY>25) {
-                var increase = if (joystickY<0) {
-                    joystickY*50;
-                }else{
-                    joystickY * 100;
-                }
-
-                target += increase;
-                sleep(70)
-            }else if(target+joystickY>=850){
-                target=850.0;
-                sleep(70);
-            }else if(target+joystickY<=25){
-                target=25.0;
-                sleep(70);
-            }
+//            var Pos = slideMotor?.let { -(it.currentPosition) }
+//            var joystickY= -gamepad1.left_stick_y;
+//
+//            if(target+joystickY<850&&target+joystickY>25) {
+//                var increase = if (joystickY<0) {
+//                    joystickY*50;
+//                }else{
+//                    joystickY * 100;
+//                }
+//
+//                target += increase;
+//                sleep(70)
+//            }else if(target+joystickY>=850){
+//                target=850.0;
+//                sleep(70);
+//            }else if(target+joystickY<=25){
+//                target=25.0;
+//                sleep(70);
+//            }
+//
+//            slideMotor.setTargetPosition(target.toInt());
+//            slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            slideMotor.setPower(0.5);
 
             motorFL?.power = (leftY - leftX - rightX) / speedDiv
             motorBL?.power = (leftY + leftX - rightX) / speedDiv
             motorFR?.power = (leftY + leftX + rightX) / speedDiv
             motorBR?.power = (leftY - leftX + rightX) / speedDiv
 
+            telemetry.addData("Slide Encoder Position: ",  slideMotor?.let { -(it.currentPosition)})
+            telemetry.addData("Rotate Encoder Position: ",  rotateMotor?.let { -(it.currentPosition)})
             telemetry.addLine("OpMode is active")
             telemetry.update()
         }
