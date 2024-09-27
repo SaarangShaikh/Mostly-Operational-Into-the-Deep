@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotor
 @TeleOp(name = "MotorTester", group = "0000000")
 class MotorTester : LinearOpMode() {
     override fun runOpMode () {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+        telemetry.addData("Status", "Initialized")
+        telemetry.update()
 
         val FL = hardwareMap.get(DcMotor::class.java, "motorFL")
         val BL = hardwareMap.get(DcMotor::class.java, "motorBL")

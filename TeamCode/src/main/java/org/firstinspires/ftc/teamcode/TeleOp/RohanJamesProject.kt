@@ -6,11 +6,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.DcMotor
 import kotlin.math.*
 
-@TeleOp(name = "RohanProject", group = "ZZZZZZZ")
+@TeleOp(name = "RohanProject", group = "Z")
 class RohanJamesProject : LinearOpMode() {
     override fun runOpMode () {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+        telemetry.addData("Status", "Initialized")
+        telemetry.update()
 
         val leftX = gamepad1.left_stick_x
         val leftY = gamepad1.left_stick_y
@@ -21,15 +21,14 @@ class RohanJamesProject : LinearOpMode() {
         var x = 0.0
         var y = 0.0
         var angle = 7*PI/18
-        var length = 40.0; //in
-        var initAngle = 0.0;
-        var horizontalEncoder = 700.0;
-        var behindEncoder = -500.0;
-        var topEncoder = 2000.0;
-        var slideSlope = topEncoder/length;
+        var length = 40.0 //in
+        val horizontalEncoder = 700.0
+        val behindEncoder = -500.0
+        val topEncoder = 2000.0
+        val slideSlope = topEncoder/length
 
         //TOGGLES
-        var coordinator = false;
+        var coordinator = false
 
         val motorFL = hardwareMap.get(DcMotor::class.java, "motorFL")
         val motorBL = hardwareMap.get(DcMotor::class.java, "motorBL")
@@ -37,19 +36,17 @@ class RohanJamesProject : LinearOpMode() {
         val motorBR = hardwareMap.get(DcMotor::class.java, "motorBR")
         val rotateMotor = hardwareMap.get(DcMotor::class.java, "motorRotate")
         val slideMotor = hardwareMap.get(DcMotor::class.java, "motorSlide")
-        slideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rotateMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        slideMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
+        rotateMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
 
         waitForStart()
-
 
         while(opModeIsActive()) {
             if (gamepad1.a){
                 sleep(1000)
                 // CALCULATE VALUES
                     length = hypot(x,y)   // Find length of slide needed in inches
-                    length *= slideSlope;
+                    length *= slideSlope
                     angle = atan2(x,y)  // Find Angle in Radians
                     angle = angle * 180.0/PI //Now its in Degrees
                     angle = horizontalEncoder - angle * 10   // Now its in encoders
@@ -65,13 +62,17 @@ class RohanJamesProject : LinearOpMode() {
 
                 //MOVE STUFF
                 if (coordinator) {
-                    rotateMotor.targetPosition = angle.toInt();
-                    rotateMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    rotateMotor.targetPosition = angle.toInt()
+                    rotateMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
                     rotateMotor.power = 0.1
 
-                    slideMotor.targetPosition = length.toInt();
-                    slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    slideMotor.targetPosition = length.toInt()
+                    slideMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
                     slideMotor.power = 0.1
+                }
+                else {
+                    rotateMotor.power = 0.0
+                    slideMotor.power = 0.0
                 }
 
             }
