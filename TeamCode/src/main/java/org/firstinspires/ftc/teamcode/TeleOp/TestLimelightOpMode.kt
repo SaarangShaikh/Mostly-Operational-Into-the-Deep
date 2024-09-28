@@ -24,7 +24,9 @@ class TestLimelightOpMode : LinearOpMode() {
                 telemetry.addData("Current robot pose: ", latestResult.botpose)
 
             }
+
             telemetry.update()
+            sleep(100)
         }
     }
 }
