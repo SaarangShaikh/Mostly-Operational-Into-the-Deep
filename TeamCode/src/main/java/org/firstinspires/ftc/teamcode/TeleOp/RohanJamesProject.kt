@@ -1,20 +1,18 @@
 package org.firstinspires.ftc.teamcode.TeleOp
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
-import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.DcMotor
+import com.qualcomm.robotcore.hardware.Gamepad
 import kotlin.math.*
 
 @TeleOp(name = "RohanProject", group = "Z")
 class RohanJamesProject : LinearOpMode() {
     override fun runOpMode () {
+
         telemetry.addData("Status", "Initialized")
         telemetry.update()
 
-        val leftX = gamepad1.left_stick_x
-        val leftY = gamepad1.left_stick_y
-        val rightX = gamepad2.left_stick_x
         val speedDiv = 2.0
 
         //MATH STUFF
@@ -30,6 +28,13 @@ class RohanJamesProject : LinearOpMode() {
         //TOGGLES
         var coordinator = false
 
+        //GAMEPADS
+        val currentGamepad1: Gamepad = Gamepad()
+        val currentGamepad2: Gamepad = Gamepad()
+        val previousGamepad1: Gamepad = Gamepad()
+        val previousGamepad2: Gamepad = Gamepad()
+
+        //MOTORS
         val motorFL = hardwareMap.get(DcMotor::class.java, "motorFL")
         val motorBL = hardwareMap.get(DcMotor::class.java, "motorBL")
         val motorFR = hardwareMap.get(DcMotor::class.java, "motorFR")
@@ -42,8 +47,21 @@ class RohanJamesProject : LinearOpMode() {
         waitForStart()
 
         while(opModeIsActive()) {
-            if (gamepad1.a){
-                sleep(1000)
+            previousGamepad1.copy(currentGamepad1);
+            previousGamepad2.copy(currentGamepad2);
+            currentGamepad1.copy(gamepad1);
+            currentGamepad2.copy(gamepad2);
+
+            val y = -gamepad1.left_stick_y.toDouble() // Remember, Y stick is reversed!
+            val x = gamepad1.left_stick_x.toDouble()
+            val rx = gamepad1.right_stick_x.toDouble()
+
+            motorFL.power = y + x + rx
+            motorBL.power = y - x + rx
+            motorFR.power = y - x - rx
+            motorBR.power = y + x - rx
+
+            if (currentGamepad1.a && !previousGamepad1.a){
                 // CALCULATE VALUES
                     length = hypot(x,y)   // Find length of slide needed in inches
                     length *= slideSlope
@@ -59,7 +77,6 @@ class RohanJamesProject : LinearOpMode() {
                         coordinator = false
                     }
 
-
                 //MOVE STUFF
                 if (coordinator) {
                     rotateMotor.targetPosition = angle.toInt()
@@ -74,13 +91,7 @@ class RohanJamesProject : LinearOpMode() {
                     rotateMotor.power = 0.0
                     slideMotor.power = 0.0
                 }
-
             }
-
-            motorFL?.power = (leftY - leftX - rightX) / speedDiv
-            motorBL?.power = (leftY + leftX - rightX) / speedDiv
-            motorFR?.power = (leftY + leftX + rightX) / speedDiv
-            motorBR?.power = (leftY - leftX + rightX) / speedDiv
 
             telemetry.addLine("OpMode is active")
             telemetry.update()

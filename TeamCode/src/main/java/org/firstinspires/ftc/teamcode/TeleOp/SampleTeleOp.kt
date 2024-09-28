@@ -46,35 +46,6 @@ class SampleTeleOp : LinearOpMode() {
             var leftY = -gamepad1.left_stick_y.toDouble()
             var rightX = -gamepad1.right_stick_x.toDouble()
 
-//            if (gamepad1.a){
-//                rotateMotor.power = 0.5;
-//            }
-//            else {
-//                rotateMotor.power = 0.0;
-//            }
-//            var Pos = slideMotor?.let { -(it.currentPosition) }
-//            var joystickY= -gamepad1.left_stick_y;
-//
-//            if(target+joystickY<850&&target+joystickY>25) {
-//                var increase = if (joystickY<0) {
-//                    joystickY*50;
-//                }else{
-//                    joystickY * 100;
-//                }
-//
-//                target += increase;
-//                sleep(70)
-//            }else if(target+joystickY>=850){
-//                target=850.0;
-//                sleep(70);
-//            }else if(target+joystickY<=25){
-//                target=25.0;
-//                sleep(70);
-//            }
-//
-//            slideMotor.setTargetPosition(target.toInt());
-//            slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            slideMotor.setPower(0.5);
             FL?.power = (leftY - leftX - rightX) / speedDiv
             BL?.power = (leftY + leftX - rightX) / speedDiv
             FR?.power = (leftY + leftX + rightX) / speedDiv
