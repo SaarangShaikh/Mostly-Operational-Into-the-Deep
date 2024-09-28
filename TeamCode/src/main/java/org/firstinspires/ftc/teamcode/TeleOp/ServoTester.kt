@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.Servo
 @TeleOp(name = "ServoPositionTester", group = "Basic Chassis")
 class ServoTester : LinearOpMode() {
     override fun runOpMode() {
-        val airplaneServo = hardwareMap.get(Servo::class.java, "airplaneServo")
+        val airplaneServo = hardwareMap.get(Servo::class.java, "launchservo")
 
         telemetry.addData("Status", "Initialized")
         telemetry.update()
